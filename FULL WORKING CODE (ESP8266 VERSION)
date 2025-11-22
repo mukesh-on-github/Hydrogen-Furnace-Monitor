@@ -1,0 +1,78 @@
+#include <ESP8266WiFi.h>
+#include <WebSocketsServer.h>
+#include <ArduinoJson.h>
+
+// 1. ENTER YOUR WIFI
+const char* ssid = "YOUR_WIFI_NAME";
+const char* password = "YOUR_PASSWORD";
+
+// 2. WebSocket server at port 81
+WebSocketsServer webSocket = WebSocketsServer(81);
+
+unsigned long lastSend = 0;
+
+void setup() {
+  Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.print("Connected! IP: ");
+  Serial.println(WiFi.localIP());
+
+  // Start WebSocket
+  webSocket.begin();
+  webSocket.onEvent(webSocketEvent);
+  Serial.println("WebSocket READY on ws://YOUR_IP:81");
+}
+
+void loop() {
+  webSocket.loop();
+
+  if (millis() - lastSend > 1000) {
+    sendSensorData();
+    lastSend = millis();
+  }
+}
+
+// SEND DATA TO DESKTOP APP
+void sendSensorData() {
+  float h2 = random(100, 500) / 100.0;      
+  float temp = random(1100, 1250);          
+  float voltage = random(210, 230);         
+  float power = voltage * (random(40, 60) / 10.0); 
+  String relay = (random(0, 10) > 5) ? "ON" : "OFF";
+
+  StaticJsonDocument<200> doc;
+
+  doc["Time"] = "Live";
+  doc["H2_raw"] = h2;
+  doc["process_temp_C"] = temp;
+  doc["voltage_V"] = voltage;
+  doc["power_W"] = power;
+  doc["relay_status"] = relay;
+
+  String json;
+  serializeJson(doc, json);
+
+  webSocket.broadcastTXT(json);
+
+  Serial.println("Sent: " + json);
+}
+
+// WebSocket handling
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+  if (type == WStype_CONNECTED) {
+    IPAddress ip = webSocket.remoteIP(num);
+    Serial.printf("[%u] Connected: %s\n", num, ip.toString().c_str());
+  } 
+  else if (type == WStype_DISCONNECTED) {
+    Serial.printf("[%u] Disconnected\n", num);
+  }
+}
