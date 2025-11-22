@@ -1,0 +1,70 @@
+Dual License  
+Copyright (c) 2025 Bytezapy  
+Author: Mukesh Pandey (Founder, Bytezapy)
+
+This software is available under a Dual Licensing Model:
+
+===========================================================
+1) OPEN-SOURCE LICENSE 
+===========================================================
+
+Permission is hereby granted, free of charge, to any
+individual using this Software for non-commercial,
+educational, academic, research, personal, or learning 
+purposes.
+
+Such individuals may use, copy, modify, merge, publish,
+and distribute the Software, provided that:
+
+- The above copyright notice,
+- The company name “Bytezapy”, and
+- The author attribution “Mukesh Pandey”
+
+are included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED.
+
+===========================================================
+2) COMMERCIAL LICENSE 
+===========================================================
+
+Commercial use includes, but is not limited to:
+
+- Industrial deployment  
+- Steel plant / metallurgical plant usage  
+- Manufacturing line integration  
+- Commercial software products  
+- Paid consulting projects  
+- Any scenario that generates direct or indirect revenue  
+
+For commercial use, a **separate written Commercial License
+Agreement** is required from Bytezapy.
+
+Unauthorized commercial use is strictly prohibited.
+
+To obtain a commercial license, contact:
+📧 bytezapy@gmail.com  
+📞 +91-9548397931 
+
+===========================================================
+3) ADDITIONAL NOTICE
+===========================================================
+
+This project contains engineering logic, real-time
+monitoring modules, sensor interpretation, and computational
+visualization features intended for demonstration,
+academic, and prototype usage.
+
+Industrial or safety-critical usage requires independent
+verification. Bytezapy and the author disclaim liability
+for unintended consequences, data interpretation errors, or
+misuse.
+
+===========================================================
+4) ACCEPTANCE
+===========================================================
+
+By using, copying, modifying, or deploying this software,
+you agree to be bound by the above terms.

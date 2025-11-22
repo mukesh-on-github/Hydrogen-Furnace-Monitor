@@ -1,0 +1,34 @@
+{
+  "name": "hydrogen-furnace-monitor",
+  "productName": "Hydrogen Furnace Monitor",
+  "version": "1.0.0",
+  "description": "Realtime hydrogen furnace telemetry & analytics — Bytezapy",
+  "author": "Mukesh Pandey (Bytezapy)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^26.2.0",
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.bytezapy.hydrogenfurnacemonitor",
+    "productName": "Hydrogen Furnace Monitor",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "asset/images/logo.png"
+    }
+  }
+}

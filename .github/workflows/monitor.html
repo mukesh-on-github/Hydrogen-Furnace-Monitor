@@ -1,0 +1,129 @@
+<section class="monitor-page full-height-dashboard">
+  
+  <!-- COLUMN 1: LEFT (Status, Controls, Indicators) -->
+  <aside class="dash-col dash-left">
+    
+    <!-- Panel: Connection & Status -->
+    <div class="dash-panel">
+      <h3 class="panel-title">System Status</h3>
+      
+      <!-- Connection Status Badge -->
+      <div id="status" class="status-badge ready">Ready</div>
+
+      <!-- Controls (Compact) -->
+      <!-- Controls (Compact) -->
+      <div class="control-group">
+        <label>Connection</label>
+        <div class="input-row">
+          <input id="ws-url" placeholder="ws://192.168.x.x:8080" />
+          <button id="btn-connect-ws" class="btn-icon" title="Connect WS">WS</button>
+          <!-- NEW USB BUTTON -->
+          <button id="btn-connect-usb" class="btn-icon" style="background:#10b981;" title="Connect USB">USB</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Connection</label>
+        <div class="input-row">
+          <input id="ws-url" placeholder="ws://192.168.x.x:8080" />
+          <button id="btn-connect-ws" class="btn-icon" title="Connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Data Source</label>
+        <div class="row-buttons">
+          <button id="btn-sample" class="btn-small">Play Sample</button>
+          <button id="btn-stop-sample" class="btn-small red">Stop</button>
+        </div>
+        <!-- Hidden file input for later implementation -->
+        <input type="file" id="file-input" accept=".csv, .xlsx, .xls" style="display:none">
+      </div>
+    </div>
+
+    <!-- Panel: Indicators (Relay & Clock) -->
+    <div class="dash-panel">
+      <h3 class="panel-title">Indicators</h3>
+      <div class="indicator-row">
+        <div class="ind-box">
+          <span class="label">Relay</span>
+          <div id="ind-relay" class="led off">OFF</div>
+        </div>
+        <div class="ind-box">
+          <span class="label">Stability</span>
+          <div id="ind-clock" class="text-val">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Live Metrics -->
+    <div class="dash-panel flex-grow">
+      <h3 class="panel-title">Live Readings</h3>
+      
+      <div class="metric-big">
+        <span class="m-label">H₂ Concentration</span>
+        <span id="stat-h2" class="m-value">0.0%</span>
+      </div>
+
+      <div class="metric-big">
+        <span class="m-label">Process Temp</span>
+        <span id="stat-temp" class="m-value">0 °C</span>
+      </div>
+
+      <div class="metric-mini">
+        <span>Power:</span> <strong id="stat-power">0 W</strong>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- COLUMN 2: CENTER (Table Only - Live Data) -->
+  <main class="dash-col dash-center">
+    <div class="dash-panel full-panel">
+      <div class="panel-header">
+        <h3 style="margin:0; font-size:14px; color:#ccc;">Telemetry Log</h3>
+        <span class="live-tag">● Live</span>
+      </div>
+      
+      <div class="table-scroll-container">
+        <table id="telemetry-table" class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>H2 (%)</th>
+              <th>Volt (V)</th>
+              <th>Eff</th>
+              <th>Relay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows injected by renderer.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- COLUMN 3: RIGHT (Graphs Only) -->
+  <aside class="dash-col dash-right">
+    
+    <!-- Graph 1 -->
+    <div class="dash-panel graph-panel">
+      <h3 class="panel-title">Efficiency Trend</h3>
+      <div class="canvas-container">
+        <canvas id="chart-eff"></canvas>
+      </div>
+    </div>
+
+    <!-- Graph 2 -->
+    <div class="dash-panel graph-panel">
+      <h3 class="panel-title">Power Consumption</h3>
+      <div class="canvas-container">
+        <canvas id="chart-power"></canvas>
+      </div>
+    </div>
+
+  </aside>
+
+</section>
