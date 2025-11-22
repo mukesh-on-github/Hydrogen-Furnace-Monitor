@@ -1,0 +1,116 @@
+<section class="options-page full-height-dashboard">
+  
+  <!-- COLUMN 1: CONFIGURATION (Wide Left) -->
+  <div class="dash-col dash-wide">
+    
+    <!-- 1. Connection Settings -->
+    <div class="dash-panel">
+      <h3 class="panel-title">Connection & Source</h3>
+      <div class="form-group">
+        <label>Default WebSocket URL</label>
+        <div class="input-row">
+          <input type="text" id="opt-ws-url" placeholder="ws://192.168.1.10:81" value="ws://localhost:81">
+          <button id="btn-save-conn" class="btn-small">Save</button>
+        </div>
+        <p class="helper-text">The app will try to auto-connect to this address on startup.</p>
+      </div>
+    </div>
+
+    <!-- 2. Column Mapping -->
+    <div class="dash-panel flex-grow">
+      <div class="panel-header-simple">
+        <h3 class="panel-title">Column Mapping</h3>
+        <button id="btn-reset-map" class="btn-link">Reset to Default</button>
+      </div>
+      
+      <p class="helper-text">Map your CSV/Excel headers to the internal system fields.</p>
+
+      <div class="mapping-grid">
+        <div class="map-row">
+          <label>Time Column</label>
+          <input type="text" id="map-time" value="Time">
+        </div>
+        <div class="map-row">
+          <label>Hydrogen (Raw)</label>
+          <input type="text" id="map-h2" value="H2_raw">
+        </div>
+        <div class="map-row">
+          <label>Voltage (V)</label>
+          <input type="text" id="map-volt" value="voltage_V">
+        </div>
+        <div class="map-row">
+          <label>Current/Power</label>
+          <input type="text" id="map-power" value="power_W">
+        </div>
+        <div class="map-row">
+          <label>Temperature</label>
+          <input type="text" id="map-temp" value="process_temp_C">
+        </div>
+         <div class="map-row">
+          <label>Relay Status</label>
+          <input type="text" id="map-relay" value="relay_status">
+        </div>
+      </div>
+      
+      <div class="action-footer">
+        <button id="btn-save-map" class="btn-primary">Apply Mapping</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COLUMN 2: BEHAVIOR (Narrow Right) -->
+  <div class="dash-col dash-narrow">
+    
+    <!-- 3. Alarms -->
+    <div class="dash-panel">
+      <h3 class="panel-title">Safety Alarms</h3>
+      
+      <div class="alarm-row">
+        <div class="alarm-label">
+          <span>Max H₂ Level (%)</span>
+          <label class="switch">
+            <input type="checkbox" id="alarm-h2-en" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <input type="number" id="alarm-h2-val" value="4.0" step="0.1">
+      </div>
+
+      <div class="alarm-row">
+        <div class="alarm-label">
+          <span>Max Temperature (°C)</span>
+          <label class="switch">
+            <input type="checkbox" id="alarm-temp-en">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <input type="number" id="alarm-temp-val" value="1250" step="10">
+      </div>
+    </div>
+
+    <!-- 4. Playback -->
+    <div class="dash-panel">
+      <h3 class="panel-title">Playback Control</h3>
+      <div class="form-group">
+        <label>Playback Speed</label>
+        <div class="range-wrap">
+          <input type="range" id="opt-speed" min="1" max="10" value="1" class="slider-range">
+          <span id="speed-val">1x</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. System Info -->
+    <div class="dash-panel flex-grow">
+      <h3 class="panel-title">System Info</h3>
+      <div class="empty-state">
+          App Version: 1.0.2<br>
+          Status: Active<br><br>
+          <em>Settings are saved automatically.</em>
+      </div>
+    </div>
+
+  </div>
+
+</section>

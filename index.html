@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <!-- Updated Title -->
+  <title>Hydrogen Furnace Monitor</title>
+
+  <!-- Fonts: Loading from local asset folder (up one level) -->
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("../asset/fonts/Inter-Regular.woff2") format("woff2");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("../asset/fonts/Inter-SemiBold.woff2") format("woff2");
+      font-weight: 600;
+    }
+    body { font-family: "Inter", sans-serif; }
+  </style>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- LIBRARIES: Must load BEFORE renderer.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+</head>
+
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <!-- Logo: Up one level from renderer folder -->
+      <img src="../asset/images/logo-64.png" class="nav-logo" alt="Logo" onerror="this.style.display='none'"/> 
+      <!-- Updated App Name -->
+      <span class="app-title">Hydrogen Furnace Monitor</span>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab active" data-page="home">Home</button>
+      <button class="tab" data-page="monitor">Monitor</button>
+      <button class="tab" data-page="options">Options</button>
+      <button class="tab" data-page="about">About</button>
+    </nav>
+  </header>
+
+  <!-- Main Content Area (Pages load here dynamically) -->
+  <div id="main-content"></div>
+
+  <!-- APPLICATION SCRIPT -->
+  <script src="renderer.js"></script>
+
+</body>
+</html>
