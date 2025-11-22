@@ -1,0 +1,181 @@
+// ESP32 WebSocket JSON broadcaster (sensors + fallback simulation)
+// - WebSocket on port 81
+// - Broadcast JSON fields used by your desktop app:
+//   h2_raw, h2_alarm, pot_raw, dhtTemp, dhtHum, dsTemp, voltage, current, power, relay_state
+
+#include <WiFi.h>
+#include <WebSocketsServer.h>   // WebSockets by Markus Sattler
+#include <Adafruit_INA219.h>    // INA219 (optional)
+#include <DHT.h>                // DHT sensor
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+//
+// -------- CONFIG --------
+//
+const char* WIFI_SSID = "YOUR_WIFI";
+const char* WIFI_PASS = "YOUR_PASS";
+
+const uint16_t WS_PORT = 81;
+WebSocketsServer webSocket = WebSocketsServer(WS_PORT);
+
+Adafruit_INA219 ina219;
+bool inaPresent = false;
+
+#define DHT_PIN   4     // DHT22 data pin
+#define DHT_TYPE  DHT22
+DHT dht(DHT_PIN, DHT_TYPE);
+
+#define ONEWIRE_PIN 33
+OneWire oneWire(ONEWIRE_PIN);
+DallasTemperature dsensor(&oneWire);
+
+const int MQ_A_PIN = 34;   // analog H2 sensor (MQ-8 / MQ-2 AOUT)
+const int MQ_D_PIN = 25;   // digital alarm output (optional)
+const int POT_PIN  = 35;   // potentiometer (ADC) for threshold
+const int RELAY_PIN = 26;  // relay IN (we send commands from client, but keep state here)
+
+unsigned long lastSend = 0;
+const unsigned long SEND_INTERVAL = 1000; // ms
+
+// helper: clamp
+float clampf(float v, float lo, float hi){ return v < lo ? lo : (v > hi ? hi : v); }
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+
+  pinMode(MQ_D_PIN, INPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, HIGH); // ensure relay OFF if active-low module
+
+  // WiFi
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  Serial.print("Connecting WiFi");
+  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+  Serial.println();
+  Serial.print("Connected — IP: "); Serial.println(WiFi.localIP());
+
+  // start WebSocket
+  webSocket.begin();
+  webSocket.onEvent(wsEvent);
+  Serial.printf("WebSocket server started on port %d\n", WS_PORT);
+
+  // init DHT
+  dht.begin();
+  // init DS18B20
+  dsensor.begin();
+
+  // try INA219
+  if (ina219.begin()) {
+    inaPresent = true;
+    ina219.setCalibration_32V_2A();
+    Serial.println("INA219 found");
+  } else {
+    inaPresent = false;
+    Serial.println("INA219 NOT found (continuing without)");
+  }
+}
+
+void loop() {
+  webSocket.loop();
+
+  unsigned long now = millis();
+  if (now - lastSend >= SEND_INTERVAL) {
+    lastSend = now;
+    sendSensorData();
+  }
+}
+
+// WebSocket event handler (connect/disconnect/messages)
+void wsEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+  switch (type) {
+    case WStype_DISCONNECTED:
+      Serial.printf("[%u] Disconnected\n", num);
+      break;
+    case WStype_CONNECTED: {
+      IPAddress ip = webSocket.remoteIP(num);
+      Serial.printf("[%u] Connected from %d.%d.%d.%d\n", num, ip[0], ip[1], ip[2], ip[3]);
+      break;
+    }
+    case WStype_TEXT: {
+      // parse simple commands like {"cmd":"relay_on"} or {"cmd":"relay_off"}
+      String msg = String((char*)payload);
+      Serial.printf("WS msg: %s\n", msg.c_str());
+      if (msg.indexOf("relay_on") >= 0) {
+        digitalWrite(RELAY_PIN, LOW);  // active-low relay ON
+      } else if (msg.indexOf("relay_off") >= 0) {
+        digitalWrite(RELAY_PIN, HIGH); // OFF
+      }
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void sendSensorData() {
+  // --- read sensors (with graceful fallback) ---
+  // MQ analog
+  int h2_raw = analogRead(MQ_A_PIN); // 0..4095 (ADC1)
+  // digital alarm (if module present)
+  int h2_d = digitalRead(MQ_D_PIN); // HIGH when alarm (module dependent)
+
+  // potentiometer (0..4095)
+  int pot_raw = analogRead(POT_PIN);
+
+  // DHT22
+  float dhtT = NAN, dhtH = NAN;
+  dhtT = dht.readTemperature();
+  dhtH = dht.readHumidity();
+  if (isnan(dhtT) || isnan(dhtH)) {
+    // fallback simulated small variation if DHT not connected
+    dhtT = 26.0 + random(-20,20)/10.0;
+    dhtH = 45.0 + random(-50,50)/100.0;
+  }
+
+  // DS18B20
+  dsensor.requestTemperatures();
+  float dsTemp = dsensor.getTempCByIndex(0);
+  if (dsTemp == DEVICE_DISCONNECTED_C) {
+    dsTemp = 32.0 + random(-50,50)/10.0; // simulated fallback
+  }
+
+  // INA219 (voltage/current/power) - optional
+  float busV = 0.0, currA = 0.0, powerW = 0.0;
+  if (inaPresent) {
+    busV = ina219.getBusVoltage_V();
+    currA = ina219.getCurrent_mA() / 1000.0;
+    powerW = ina219.getPower_mW() / 1000.0;
+  } else {
+    // simulated plausible values (you can remove when real INA219 is connected)
+    busV = 4.8 + (random(-50,50)/100.0);
+    currA = 2.0 + (random(-20,20)/100.0);
+    powerW = busV * currA;
+  }
+
+  // derive alarm by pot threshold mapping (map pot 0..4095 to threshold 800..3500)
+  int threshold = map(pot_raw, 0, 4095, 800, 3500);
+  bool h2_alarm = (h2_d == HIGH) || (h2_raw > threshold);
+
+  // relay state (for JSON) - read current pin
+  String relay_state = (digitalRead(RELAY_PIN) == LOW) ? "ON" : "OFF";
+
+  // Build JSON manually (small, no ArduinoJson required)
+  String payload = "{";
+  payload += "\"h2_raw\":" + String(h2_raw) + ",";
+  payload += "\"h2_alarm\":" + String(h2_alarm?1:0) + ",";
+  payload += "\"pot_raw\":" + String(pot_raw) + ",";
+  payload += "\"dhtTemp\":" + String(dhtT,2) + ",";
+  payload += "\"dhtHum\":" + String(dhtH,2) + ",";
+  payload += "\"dsTemp\":" + String(dsTemp,2) + ",";
+  payload += "\"voltage\":" + String(busV,3) + ",";
+  payload += "\"current\":" + String(currA,3) + ",";
+  payload += "\"power\":" + String(powerW,3) + ",";
+  payload += "\"relay_state\":\"" + relay_state + "\"";
+  payload += "}";
+
+  // Broadcast to all clients
+  webSocket.broadcastTXT(payload);
+  Serial.println("Broadcast: " + payload);
+}
