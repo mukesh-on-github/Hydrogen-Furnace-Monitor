@@ -1,4 +1,4 @@
-Hydrogen Furnace Monitor
+Hydrogen Furnace Monitor 👉⬇️[https://github.com/mukesh-on-github/Hydrogen-Furnace-Monitor/releases/tag/v1.0.1]
 
 <p align="center">
 <img src="logo-256.png" alt="App Logo" width="100">
