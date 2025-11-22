@@ -1,7 +1,7 @@
 Hydrogen Furnace Monitor
 
 <p align="center">
-<img src="asset/images/logo-64.png" alt="App Logo" width="100">
+<img src="logo-256.png" alt="App Logo" width="100">
 
 
 
