@@ -55,5 +55,3 @@ Prerequisites
 Node.js (v16 or higher recommended)
 
 npm (comes with Node.js)
-
-1. Clone the Repository
